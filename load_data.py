@@ -14,3 +14,5 @@ for i in datas_folders:
 for i in data_folders:
     a = os.listdir(i)
     print(np.array(a).shape)
+
+#khai
