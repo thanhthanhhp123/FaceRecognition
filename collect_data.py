@@ -3,9 +3,9 @@ import os
 import time
 
 start = 0
-name = 'thanh'
+name = 'khai'
 i = 0
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 # cap.set(1280)
 # cap.set(640)
 try:
@@ -15,13 +15,13 @@ except:
 while True:
     ret, frame = cap.read()
     #sleep 500ms
+    i+=1
     now = time.time()
-    if(now - start >= 500):
-        cv2.imwrite('Datasets/'+name+f'/image{i+1}.jpg', frame)
-        start = now
-    cv2.imshow('Capture', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    if now - start >= 1000:
+        cv2.imwrite('Datasets/'+name+f'/image{i}.jpg', frame)
+        cv2.imshow('Capture', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
     
 cap.release()
 cv2.destroyAllWindows()
