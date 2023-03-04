@@ -11,5 +11,8 @@ import numpy as np
 import matplotlib.pyplot
 
 X, Y, classes = datasets().load_datasets()
+m_train = X.shape[0]
+X_flatten = X.reshape((m_train, -1)).T
+# print(X_flatten.shape)
 
-print(X.shape)
+X_flatten = X_flatten/255.
