@@ -1,26 +1,41 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-from algorithms import LogisticRegression
+import os 
 
-# datas_folders = os.listdir('Datasets')
-# data_folders = []
-# for i in datas_folders:
-#     a = os.path.join('Datasets/', i)
-#     data_folders.append(a)
+np.random.seed(1)
+datasets_folder = 'Datasets'
 
-# print(data_folders)
+# X = []
+# Y = []
+# hung_folder = os.listdir('Datasets/Hung')
+# for i in hung_folder:
+#     img = cv2.imread(os.path.join('Datasets/Hung/', i))
+#     X.append(img)
+#     Y.append(1)
 
-hung_folder = 'Datasets/Test/'
-hung_folder_ = [os.path.join(hung_folder, i) for i in os.listdir(hung_folder)]
-hung_img = []
-for i in hung_folder_:
-    hung_img.append(cv2.imread(i))
+# for i in os.listdir('Datasets/Truong'):
+#     img = cv2.imread(os.path.join('Datasets/Truong/', i), 1)
+#     X.append(img)
+#     Y.append(0)
 
-fig, ax = plt.subplots(1, len(hung_img))
-for i in range(len(hung_img)):
-    ax[i].imshow(hung_img[i], cmap = 'gray')
-    ax[i].axis('off')
+# X = np.array(X)
+# Y = np.array(Y)
 
-# print(np.array(hung_img))
+class datasets():
+    def __init__(self):
+        pass
+    def load_datasets(self):
+        X = []; Y = []
+        for i in os.listdir('Datasets/Hung'):
+            img = cv2.imread(os.path.join('Datasets/Hung', i))
+            X.append(img)
+            Y.append(1)
+        for i in os.listdir('Datasets/Truong'):
+            img = cv2.imread(os.path.join('Datasets/Truong', i))
+            X.append(img)
+            Y.append(0)
+        X = np.array(X)
+        Y = np.array(Y)
+        classes = ['Hung', 'Truong']
+        return X, Y, classes
