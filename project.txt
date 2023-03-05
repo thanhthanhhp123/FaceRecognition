@@ -1,9 +1,0 @@
-Naive Bayes
-
-Use CV2 to load data, flatten it
-
-Reshape 32 x 32, 64 x 64, 128 x 128
-
-Rate the algorithm
-
-References

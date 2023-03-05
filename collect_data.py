@@ -17,7 +17,8 @@ while True:
     #sleep 500ms
     i+=1
     now = time.time()
-    if now - start >= 1000:
+    if now - start >= 2:
+        start = now
         cv2.imwrite('Datasets/'+name+f'/image{i}.jpg', frame)
         cv2.imshow('Capture', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
