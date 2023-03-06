@@ -6,8 +6,9 @@ start = 0
 name = 'khai'
 i = 0
 cap = cv2.VideoCapture(0)
-# cap.set(1280)
-# cap.set(640)
+
+cap.set(3, 1280)
+cap.set(4, 640)
 try:
     os.mkdir('Datasets/'+name)
 except:
@@ -15,14 +16,17 @@ except:
 while True:
     ret, frame = cap.read()
     #sleep 500ms
-    i+=1
     now = time.time()
-    if now - start >= 2:
+    cv2.imshow('Capture', frame)
+    if now - start >= 1:
         start = now
+        i += 1
         cv2.imwrite('Datasets/'+name+f'/image{i}.jpg', frame)
-        cv2.imshow('Capture', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if i == 100:
             break
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
     
 cap.release()
 cv2.destroyAllWindows()
