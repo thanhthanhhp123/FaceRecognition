@@ -2,9 +2,13 @@ import os
 import collections
 import numpy as np
 from PIL import Image
+def accuracy(y_pred,y_test): 
+    accuracy = np.sum(y_pred == y_test) / len(y_test)
+    print("Accuracy:", accuracy)
+
 def euclidean_distance(x1, x2):
     return np.sqrt(np.sum((x1 - x2)**2))
-def knn(X_train, y_train, X_test, k=3):
+def knn(X_train, y_train, X_test, k=10):
     y_pred = []
     for i in range(len(X_test)):
         distances = [euclidean_distance(X_test[i], x) for x in X_train]
@@ -15,30 +19,7 @@ def knn(X_train, y_train, X_test, k=3):
     return np.array(y_pred)
 
 def split_train_test(X, y, test_ratio=0.2, random_state=None):
-    """
-    Tách tập dữ liệu thành tập train và test.
-    Parameters
-    ----------
-    X : numpy.ndarray
-        Mảng chứa dữ liệu đầu vào.
-    y : numpy.ndarray
-        Mảng chứa nhãn đầu ra.
-    test_ratio : float, optional
-        Tỷ lệ dữ liệu được tách ra làm tập test, mặc định là 0.2.
-    random_state : int, optional
-        Seed để lấy mẫu ngẫu nhiên, mặc định là None.
-
-    Returns
-    -------
-    X_train : numpy.ndarray
-        Mảng chứa dữ liệu huấn luyện.
-    y_train : numpy.ndarray
-        Mảng chứa nhãn huấn luyện.
-    X_test : numpy.ndarray
-        Mảng chứa dữ liệu kiểm tra.
-    y_test : numpy.ndarray
-        Mảng chứa nhãn kiểm tra.
-    """
+   
     # Tính số lượng dữ liệu trong tập test
     n_test = int(len(X) * test_ratio)
     # Thiết lập seed cho hàm np.random.choice
@@ -85,6 +66,7 @@ X_train,y_train,X_test,y_test=split_train_test(X,y,test_ratio=0.2,random_state=4
 # In kích thước của X và y
 print(f'Shape of X: {X.shape}')
 print(f'Shape of y: {y.shape}')
-y_pre=knn(X_train, y_train,X_test,k=3)
-print(y_pre)
+y_pred=knn(X_train, y_train,X_test,k=3)
+print(y_pred)
 print(y_test)
+accuracy(y_pred,y_test)

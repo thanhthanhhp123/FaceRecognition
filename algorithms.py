@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import random
+import collections
 from scipy import stats
 
 class LinearRegression(object):
@@ -164,37 +165,48 @@ class NaiveBayes(object):
 
 
 
-class KNN(object):
-  def __init__(self, k, p):
-    self.k = k
-    self.p = p
+# class KNN(object):
+#   def __init__(self, k, p):
+#     self.k = k
+#     self.p = p
   
-  def euclidean(self, v1, v2):
-    return np.sqrt(np.sum((v1 - v2)**2))
+#   def euclidean(self, v1, v2):
+#     return np.sqrt(np.sum((v1 - v2)**2))
   
-  def fitData(self, X_train, y_train):
-    self.X_train = X_train
-    self.y_train = y_train
+#   def fitData(self, X_train, y_train):
+#     self.X_train = X_train
+#     self.y_train = y_train
 
-  def get_neighbors(self, test_row):
-    dis = list()
-    for (train_row, train_class) in zip(self.X_train, self.y_train):
-      dist = self.euclidean(train_row, test_row)
-      dis.append(dist, train_class)
+#   def get_neighbors(self, test_row):
+#     dis = list()
+#     for (train_row, train_class) in zip(self.X_train, self.y_train):
+#       dist = self.euclidean(train_row, test_row)
+#       dis.append(dist, train_class)
     
-    dis.sort(key=lambda x: x[0])
+#     dis.sort(key=lambda x: x[0])
 
-    neighbours = list()
+#     neighbours = list()
 
-    for i in range(self.k):
-       neighbours.append(dis[i])
+#     for i in range(self.k):
+#        neighbours.append(dis[i])
     
-    return neighbours
+#     return neighbours
   
-  def predict(self, X_test):
-     preds = []
-     for test_row in X_test:
-        nearest_neighbours = self.get_neighbours(test_row)
-        majority = stats.mode(nearest_neighbours)[0][0]
-        preds.append(majority)
-        return np.array(preds)
+#   def predict(self, X_test):
+#      preds = []
+#      for test_row in X_test:
+#         nearest_neighbours = self.get_neighbours(test_row)
+#         majority = stats.mode(nearest_neighbours)[0][0]
+#         preds.append(majority)
+#         return np.array(preds)
+def euclidean_distance(x1, x2):
+    return np.sqrt(np.sum((x1 - x2)**2))
+def knn(X_train, y_train, X_test, k=3):
+    y_pred = []
+    for i in range(len(X_test)):
+        distances = [euclidean_distance(X_test[i], x) for x in X_train]
+        k_idx = np.argsort(distances)[:k]
+        k_labels = [y_train[idx] for idx in k_idx]  
+        most_common = collections.Counter(k_labels).most_common(1)
+        y_pred.append(most_common[0][0])
+    return np.array(y_pred)
