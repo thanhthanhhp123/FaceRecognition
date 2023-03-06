@@ -25,7 +25,7 @@ def navie_bayes(X_train, y_train, X_test):
             prob = 1
             for j in range(len(x)):
                 prob *= (1 / (np.sqrt(2 * np.pi * classes_std[i][j] ** 2))) * np.exp(-(x[j] - classes_mean[i][j]) ** 2 / (2 * classes_std[i][j] ** 2))
-            probabilities.append(probability)
+            probs.append(prob)
         # Choose the max prob
         y_pred.append(classes[np.argmax(probs)])
 
@@ -36,12 +36,12 @@ class datasets():
         pass
     def load_datasets():
         X = []; Y = []
-        for i in os.listdir('Datasets/Hung'):
-            img = cv2.imread(os.path.join('Datasets/Hung', i))
+        for i in os.listdir('Datasets/khai'):
+            img = cv2.imread(os.path.join('Datasets/khai', i))
             X.append(img)
             Y.append(1)
-        for i in os.listdir('Datasets/Trường'):
-            img = cv2.imread(os.path.join('Datasets/Trường', i))
+        for i in os.listdir('Datasets/quan'):
+            img = cv2.imread(os.path.join('Datasets/quan', i))
             X.append(img)
             Y.append(0)
         X = np.array(X)
