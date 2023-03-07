@@ -3,7 +3,7 @@ import math
 import random
 from scipy import stats
 import copy
-
+import collections
 class LinearRegression(object):
     def __init__(self, epochs, lr):
         self.epochs = epochs
@@ -201,37 +201,20 @@ class NaiveBayes(object):
 
 
 
-class KNN(object):
-  def __init__(self, k, p):
-    self.k = k
-    self.p = p
-  
-  def euclidean(self, v1, v2):
-    return np.sqrt(np.sum((v1 - v2)**2))
-  
-  def fitData(self, X_train, y_train):
-    self.X_train = X_train
-    self.y_train = y_train
-
-  def get_neighbors(self, test_row):
-    dis = list()
-    for (train_row, train_class) in zip(self.X_train, self.y_train):
-      dist = self.euclidean(train_row, test_row)
-      dis.append(dist, train_class)
-    
-    dis.sort(key=lambda x: x[0])
-
-    neighbours = list()
-
-    for i in range(self.k):
-       neighbours.append(dis[i])
-    
-    return neighbours
-  
-  def predict(self, X_test):
-     preds = []
-     for test_row in X_test:
-        nearest_neighbours = self.get_neighbours(test_row)
-        majority = stats.mode(nearest_neighbours)[0][0]
-        preds.append(majority)
-        return np.array(preds)
+class KNN():
+  def __init__(self, k):
+      self.k = k
+  def euclidean_distance(self, x1, x2):
+     return np.sqrt(np.sum((x1 - x2) ** 2))
+  def accuracy(self, y_test):
+    acc1 = np.sum(self.y_pred == y_test) / len(y_test) * 100
+    print('Accuracy: {}'.format(acc1))
+  def fit(self, X_train, y_train, X_test):
+    self.y_pred = []
+    for i in range(len(X_test)):
+      distances = [self.euclidean_distance(X_test[i], x) for x in X_train]
+      k_idx = np.argsort(distances)[:self.k]
+      k_labels = [y_train[idx] for idx in k_idx]  
+      most_common = collections.Counter(k_labels).most_common(1)
+      self.y_pred.append(most_common[0][0])
+    return np.array(self.y_pred)
