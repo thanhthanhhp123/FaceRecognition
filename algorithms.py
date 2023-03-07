@@ -78,9 +78,8 @@ class LogisticRegression(object):
         #Updating
         w = w - self.alpha * dw
         b = b - self.alpha * db
+        self.costs.append(cost)
         if i % math.ceil(self.epochs / 10) == 0:
-              self.costs.append(cost)
-          
               # Print the cost every 100 training iterations
               if print_cost:
                   print ("Cost after iteration %i: %f" %(i, cost))
