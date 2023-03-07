@@ -15,7 +15,7 @@ import cv2
 X, Y, classes = datasets().load_datasets()
 
 #---------------------------------------------------
-# # #Original size 720 x 1280
+# #Original size 720 x 1280
 X_train, y_train, X_test, y_test = datasets().split_train_test(X, Y, test_ratio=0.2, random_state=12)
 X_train = X_train.reshape((X_train.shape[0], -1)).T / 255.
 X_test = X_test.reshape((X_test.shape[0], -1)).T / 255.
@@ -32,7 +32,7 @@ print(model.costs)
 #--------------------------------------------------------
 #Size 128 x 72
 size = (128, 72)
-resized_images = np.zeros((200, 72, 128, 3))
+resized_images = np.zeros((200, 72, 128))
 for i in range(X.shape[0]):
     resized_images[i] = cv2.resize(X[i], size)
     
@@ -54,7 +54,7 @@ plt.plot(model.costs)
 #Size 64 x 36
 
 size = (64, 36)
-resized_images = np.zeros((200, 36, 64, 3))
+resized_images = np.zeros((200, 36, 64))
 for i in range(X.shape[0]):
     resized_images[i] = cv2.resize(X[i], size)
 
