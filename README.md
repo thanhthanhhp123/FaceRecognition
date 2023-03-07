@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to Data Structures and Algorithms 👋</h1>
+<h1 align="center">Welcome to Face Recognition Project 👋</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
    <img alt="Issues" src="https://img.shields.io/github/commits-since/thanhthanhhp123/Data-Structures-And-Algorithms/v.1.0.0/main" />
