@@ -85,83 +85,48 @@ class LogisticRegression(object):
          "num_iterations": self.epochs}
     return d
   
-class NaiveBayes(object):
-  def __init__(self, data):
-    self.data = data
-  def encode(self):
-    self.classes = []
-    for i in range(len(self.data)):
-      if self.data[i][-1] not in self.classes:
-          self.classes.append(self.data[i][-1])
-    for i in range(len(self.classes)):
-        for j in range(len(self.data)):
-          if self.data[j][-1] == self.classes[i]:
-              self.data[j][-1] = i
-    return self.data
-   
-   #Splitting data
-  def split(self, ratio):
-    train_num = int(len(self.data) * ratio)
-    train = []
-    test = list(self.data)
-    while len(train) < train_num:
-       idx = random.randrange(len(test))
-       train.append(test.pop(idx))
-    
-    return train, test
-  #Group the data rows under the each class yes or no in dict
-  def groupUnderClass(self):
-    dict = {}
-    for i in range(len(self.data)):
-      if(self.data[i][-1] not in dict):
-        dict[self.data[i][-1]] = []
-      dict[self.data[i][-1]].append(self.data[i])
-    return dict  
-  
-  def mean(self, numbers): 
-     return sum(numbers) / float(len(numbers))
-  
-  def std_dev(self, numbers):
-     avg = self.mean(numbers)
-     variance = sum([pow(x - avg, 2) for x in numbers]) / float(len(numbers) - 1)
-     return math.sqrt(variance)
-  
-  def MeanAndStdDevForClass(self):
-    self.info = {}
-    dict = self.groupUnderClass()
-    for classValue, instaces in dict.items():
-      self.info[classValue] = self.MeanAndStdDevForClass(instaces)
-  
-  def calculateGaussianProbability(self, x, mean, stdev):
-    expo = math.exp(-(math.pow(x - mean, 2) / (2 * math.pow(stdev, 2))))
-    return (1 / (math.sqrt(2 * math.pi) * stdev)) * expo
-  
-  def calculateClassProbabilities(self, test):
-    probabilities = {}
-    for classValue, classSummaries in self.info.items():
-      probabilities[classValue] = 1
-      for i in range(len(classSummaries)):
-          mean, std_dev = classSummaries[i]
-          x = test[i]
-          probabilities[classValue] *= self.calculateGaussianProbability(x, mean, std_dev)
-    return probabilities
-  
-  def predict(self, test):
-    probabilities = self.calculateClassProbabilities(test)
-    bestLabel, bestProb = None, -1
-    for classValue, prob in probabilities.items():
-        if bestLabel is None or prob > bestProb:
-           bestProb = prob
-           bestLabel = classValue
-    return bestLabel
-  
-  def getPredictions(self, test):
-    predictions = []
-    for i in range(len(test)):
-       result = self.predict(self.info, test[i])
-       predictions.append(result)
-    return predictions
+class Naive_Bayes():
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
 
+    def naive_bayes(self, X_train, y_train, X_test):
+        # Calculate p(y)
+        classes, classes_count = np.unique(y_train, return_counts = True)
+        classes_prob = classes_count / len(y_train)
+
+        # Calculate means and standard deviation of X
+        classes_mean = []
+        classes_std = []
+        for i in range(len(classes)):
+            class_X = np.array(X_train[np.where(y_train == classes[i])])
+            classes_mean.append(np.mean(class_X, axis=0))
+            classes_std.append(np.std(class_X, axis=0))
+
+        classes_mean = np.array(classes_mean)
+        classes_std = np.array(classes_std)
+
+        # Suppose X has Gaussian distribution, calculate p(y|X)
+        self.y_pred = []
+
+        probs = []
+        for x in X_test:
+            probs = np.ones(len(classes), dtype = float)
+            for i in range(len(classes)):
+                # Calculate p(X|y)
+                gaussian = (1 / (np.sqrt(2 * np.pi * classes_std[i] ** 2))) * np.exp(-(x - classes_mean[i]) ** 2 / (2 * classes_std[i] ** 2))
+                
+                # Calculate the hypothesis h(x)
+                probs[i] = np.sum(np.log(gaussian + 0.001)) + np.log(classes_prob[i])
+
+            # Choose the max prob
+            self.y_pred.append(classes[np.argmax(probs)])
+
+        return self
+
+    def accuracy(self, y_test): 
+        accuracy = np.sum(self.y_pred == y_test) / len(y_test)
+        return accuracy
 
 
 class KNN(object):
