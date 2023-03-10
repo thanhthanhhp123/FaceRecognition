@@ -2,7 +2,8 @@ import numpy as np
 import math
 import random
 from scipy import stats
-
+import copy
+import collections
 class LinearRegression(object):
     def __init__(self, epochs, lr):
         self.epochs = epochs
@@ -36,53 +37,89 @@ class LinearRegression(object):
         return w, b, J_history
     
 class LogisticRegression(object):
-  def __init__(self, eta = 0.01, epochs = 50):
-    self.eta = eta
+  def __init__(self, epochs, alpha):
     self.epochs = epochs
+    self.alpha = alpha
   def sigmoid(self, z):
     s = 1/(1+np.exp(-z))
     return s
-  def propagate(self, X, y, w, b):
+  def initialize_with_zeros(self, dim):
+    w = np.random.randn(dim, 1) * 0.0001
+    b = 0
+    return w, b
+  def propagate(self, w, b, X, y):
     m = X.shape[1]
+    #FORWARD PROPAGATION
     A = self.sigmoid(np.dot(w.T, X) + b)
-    cost = (- 1 / m) * np.sum(y * np.log(A) + (1 - y) * (np.log(1 - A)))
+    loss = y*np.log(A + 1e-9) + (1-y)*np.log(1-A + 1e-9)
+    cost = -1/m * np.sum(loss, axis = 1, keepdims = True)
 
-    dw = 1/m * np.dot(X, (A -y).T)
+    #BACKWARD PROPAGATION
+    dw = 1/m * np.dot(X, (A- y).T)
     db = 1/m * np.sum(A - y)
 
-    cost = np.squeeze(cost)
+    cost = np.squeeze(np.array(cost))
 
-    return dw, db, cost
-  def optimize(self, X, y, w, b):
-    costs = []
-    for i in range(self.epochs):
-      dw, db, cost = self.propagate(X, y, w, b)
+    grads = {'dw': dw,
+              'db': db}
+    return grads, cost
 
-      w = w - self.eta * dw
-      b = b - self.eta * db
-      costs.append(cost)
-      if i % 100 == 0:
-        print('Cost after epoch %i: %f' %(i, cost))
+  def optimize(self, w, b, X, y, print_cost = True):
+      w = copy.deepcopy(w)
+      b = copy.deepcopy(b)
+      
+      self.costs = []
 
-    return w, b, dw, db, costs
-  def predict(self, X, w, b):
+      for i in range(self.epochs):
+        grads, cost = self.propagate(w, b, X, y)
+        dw = grads['dw']
+        db = grads['db']
+
+        #Updating
+        w = w - self.alpha * dw
+        b = b - self.alpha * db
+        self.costs.append(cost)
+        if i % math.ceil(self.epochs / 10) == 0:
+              # Print the cost every 100 training iterations
+              if print_cost:
+                  print ("Cost after iteration %i: %f" %(i, cost))
+      
+      params = {"w": w,
+                "b": b}
+      
+      grads = {"dw": dw,
+              "db": db}
+      
+      return params, grads
+  def predict(self, w, b, X):
     m = X.shape[1]
     Y_prediction = np.zeros((1, m))
-    # w = w.reshape(X.shape[0], 1)
+    w = w.reshape(X.shape[0], 1)
     A = self.sigmoid(np.dot(w.T, X) + b)
 
     for i in range(A.shape[1]):
       Y_prediction[0, i] = 1 if A[0, i] > 0.5 else 0
     return Y_prediction
-  def fit(self, X, y):
-    w = np.zeros(shape = (X.shape[0], 1))
-    b = 0 
-    w, b, dw, db, costs = self.optimize(X, y, w, b)
-    d = {"costs": costs,
+  def fit(self, X_train, y_train, X_test, y_test, print_cost = False):
+    w, b = self.initialize_with_zeros(X_train.shape[0])
+    parameters, grads = self.optimize(w, b, X_train, y_train, print_cost)
+    w = parameters['w']
+    b = parameters['b']
+
+    Y_prediction_test = self.predict(w, b, X_test)
+    Y_prediction_train = self.predict(w, b, X_train)
+
+    if print_cost:
+      print("Train accuracy: {}".format(100 - np.mean(np.abs(Y_prediction_train - y_train)) * 100))
+      print('Test accuracy: {}'.format(100 - np.mean(np.abs(Y_prediction_test - y_test)) * 100))
+    d = {
+         "Y_prediction_test": Y_prediction_test, 
+         "Y_prediction_train" : Y_prediction_train, 
          "w" : w, 
          "b" : b,
-         "learning_rate" : self.eta,
+         "learning_rate" : self.alpha,
          "num_iterations": self.epochs}
+    
     return d
   
 class Naive_Bayes():
@@ -128,38 +165,20 @@ class Naive_Bayes():
         accuracy = np.sum(self.y_pred == y_test) / len(y_test)
         return accuracy
 
-
-class KNN(object):
-  def __init__(self, k, p):
-    self.k = k
-    self.p = p
-  
-  def euclidean(self, v1, v2):
-    return np.sqrt(np.sum((v1 - v2)**2))
-  
-  def fitData(self, X_train, y_train):
-    self.X_train = X_train
-    self.y_train = y_train
-
-  def get_neighbors(self, test_row):
-    dis = list()
-    for (train_row, train_class) in zip(self.X_train, self.y_train):
-      dist = self.euclidean(train_row, test_row)
-      dis.append(dist, train_class)
-    
-    dis.sort(key=lambda x: x[0])
-
-    neighbours = list()
-
-    for i in range(self.k):
-       neighbours.append(dis[i])
-    
-    return neighbours
-  
-  def predict(self, X_test):
-     preds = []
-     for test_row in X_test:
-        nearest_neighbours = self.get_neighbours(test_row)
-        majority = stats.mode(nearest_neighbours)[0][0]
-        preds.append(majority)
-        return np.array(preds)
+class KNN():
+  def __init__(self, k):
+      self.k = k
+  def euclidean_distance(self, x1, x2):
+     return np.sqrt(np.sum((x1 - x2) ** 2))
+  def accuracy(self, y_test):
+    acc1 = np.sum(self.y_pred == y_test) / len(y_test)
+    return acc1
+  def fit(self, X_train, y_train, X_test):
+    self.y_pred = []
+    for i in range(len(X_test)):
+      distances = [self.euclidean_distance(X_test[i], x) for x in X_train]
+      k_idx = np.argsort(distances)[:self.k]
+      k_labels = [y_train[idx] for idx in k_idx]  
+      most_common = collections.Counter(k_labels).most_common(1)
+      self.y_pred.append(most_common[0][0])
+    return np.array(self.y_pred)

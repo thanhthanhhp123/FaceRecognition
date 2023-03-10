@@ -1,20 +1,41 @@
 import cv2
+from PIL import Image
 import numpy as np
 import os
 
+np.random.seed(1)
 class datasets():
     def __init__(self):
         pass
-    def load_datasets():
+    def load_datasets_rgb():
         X = []; y = []
-        for i in os.listdir('Datasets/khai'):
-            img = cv2.imread(os.path.join('Datasets/khai', i))
-            X.append(img)
-            y.append(1)
         for i in os.listdir('Datasets/quan'):
             img = cv2.imread(os.path.join('Datasets/quan', i))
             X.append(img)
             y.append(0)
+
+        for i in os.listdir('Datasets/khai'):
+            img = cv2.imread(os.path.join('Datasets/khai', i))
+            X.append(img)
+            y.append(1)
+
+        X = np.array(X)
+        y = np.array(y)
+
+        return X, y
+
+    def load_datasets_grayscale():
+        X = []; y = []
+        for i in os.listdir('Datasets/quan'):
+            img = Image.open(os.path.join('Datasets/quan', i)).convert('L')
+            X.append(np.array(img))
+            y.append(0)
+
+        for i in os.listdir('Datasets/khai'):
+            img = Image.open(os.path.join('Datasets/khai', i)).convert('L')
+            X.append(np.array(img))
+            y.append(1)
+
         X = np.array(X)
         y = np.array(y)
 
